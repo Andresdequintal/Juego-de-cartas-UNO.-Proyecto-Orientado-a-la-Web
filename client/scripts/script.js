@@ -6,8 +6,8 @@ const specialCards=['jump','reverse','draw2']
 let players=[];
 let currentPlayerIndex=0;
 let direction=1;
-let currentColor = null; // Color actual del juego para comodines
-let rankingSalida = [];
+let currentColor = null; // Color actual del juego (para comodines)
+let over=0; //si la ronda se ha acabado
 
 const card = {
     id:'R-5',
@@ -33,23 +33,24 @@ function initializeDeck(){
             deck.push({color, type:'number', value:n});
             if(n!==0) deck.push({color, type:'number', value:n});
         }
-        // cartas especiales: salto, reversa, roba 2 (2 de cada una por color)
+        // Cartas especiales: salto, reversa, roba 2 (2 de cada una por color)
         for(let i=0; i<2; i++) {
             deck.push({color, type:'special', value:'jump'});
             deck.push({color, type:'special', value:'reverse'});
             deck.push({color, type:'special', value:'draw2'});
         }
     });
-    // comodines (4 de cada uno)
+    // Comodines (4 de cada uno)
     for(let i=0; i<4; i++) {
         deck.push({color:null, type:'wild', value:'wild'});
         deck.push({color:null, type:'wild', value:'draw4'});
     }
-    // mezclar el mazo
+    // Mezclar el mazo
     deck = deck.sort(()=>Math.random()-0.5);
 }
 
 function startGame(numPlayers){
+    over=false;
     players = [];
     const tipoJuego = localStorage.getItem('tipoJuego') || 'bots';
     for(let i=0; i<numPlayers; i++){
@@ -69,21 +70,15 @@ function startGame(numPlayers){
 }
 
 function dealCards(){
-    // reparte 7 cartas a cada jugador
+    // Reparte 7 cartas a cada jugador
     for(let i=0; i<players.length; i++){
         players[i].cards = [];
         for(let j=0; j<7; j++){
             players[i].cards.push(deck.pop());
         }
     }
-    // pone la primera carta en el descarte
+    // Pone la primera carta en el descarte
     discardPile = [deck.pop()];
-    // asegura que la primera carta no sea un +4
-    while (discardPile[0].value === 'draw4'){
-        deck.unshift(discardPile.shift());
-        discardPile.push(deck.pop());
-    }
-    currentColor = discardPile[0].color;
 }
 
 function mostrarSelectorColor(callback) {
@@ -100,15 +95,15 @@ function mostrarSelectorColor(callback) {
 
 function playCard(playerIndex, card) {
     const top = discardPile[discardPile.length - 1];
-    const colorToMatch = currentColor || top.color; //currentColor es el color actual del juego para comodines, top.color es el color de la carta superior del descarte
+    const colorToMatch = currentColor || top.color;
     if (
         card.color === colorToMatch ||
         card.value === top.value ||
         card.type === 'wild'
     ) {
-        const idx = players[playerIndex].cards.findIndex(c => c === card); // busca el indice de la carta seleccionada en la mano del jugador
+        const idx = players[playerIndex].cards.findIndex(c => c === card);
         if (idx !== -1) {
-            players[playerIndex].cards.splice(idx, 1); //metodo splice de los arreglos que puede eliminar, reemplazar o agregar elementos. Splice idx, 1 elimina exactamente una carta (la jugada)de la mano del jugador
+            players[playerIndex].cards.splice(idx, 1);
             discardPile.push(card);
 
             if (card.type === 'special') {
@@ -140,13 +135,13 @@ function playCard(playerIndex, card) {
                             nextTurn();
                         }
                         mostrarTodasLasManos();
-                        mostrarCartaDescarte(true);
+                        mostrarCartaDescarte();
                         nextTurn();
                         mostrarTodasLasManos();
-                        mostrarCartaDescarte(true);
+                        mostrarCartaDescarte();
                         turnoBot();
                     });
-                    return false; // espera a que elija color
+                    return false; // Espera a que elija color
                 } else {
                     const coloresEnMano = players[playerIndex].cards.map(c => c.color).filter(c => ['red','green','blue','yellow'].includes(c));
                     if (coloresEnMano.length > 0) {
@@ -175,31 +170,28 @@ function playCard(playerIndex, card) {
 }
 
 function drawCard(playerIndex){
-    if(deck.length === 0) return; // no hay cartas para robar
+    if(deck.length === 0) return; // No hay cartas para robar
     const card = deck.pop();
     players[playerIndex].cards.push(card);
 }
 
-function nextTurn() {
-    let over = false;
-    for (let i = 0; i < players.length; i++) {
-        if (players[i].cards.length === 0) {
-            over = true;
+function nextTurn(){
+    for(let i=0; i<players.length; i++){
+        if(players[i].cards.length==0){
+            over=true;
         }
-    }
-    if (over) {
-        alert('FELICIDADES JUGADOR ' + players[currentPlayerIndex].name + ' ha ganado esta ronda, ahora se mostrará el puntaje');
+    }if(over){
+        alert('FELICIDADES JUGADOR '+players[currentPlayerIndex].name+' has ganado esta ronda, ahora se mostrará el puntaje');
         countPoints(currentPlayerIndex);
-        localStorage.setItem('players', JSON.stringify(players));
-        localStorage.setItem('rankingSalida', JSON.stringify(rankingSalida));
-        window.location.href = 'ResultadoJuego_index.html';
-    } else {
+        localStorage.setItem('players', JSON.stringify(players))
+        window.location.href='ResultadoJuego_index.html';
+    }else{
         currentPlayerIndex = (currentPlayerIndex + direction + players.length) % players.length;
     }
 }
 
 function checkUNO(playerIndex){
-    // si al jugador le queda una carta, debe decir UNO
+    // Si al jugador le queda una carta, debe decir UNO
     if(players[playerIndex].cards.length === 1){
         players[playerIndex].saidUNO = true;
         return true;
@@ -208,6 +200,7 @@ function checkUNO(playerIndex){
 }
 
 function countPoints(winnerIndex){
+    // Suma los puntos de las cartas de los demás jugadores
     let points = 0;
     players.forEach((p,i)=>{
         if(i!==winnerIndex){
@@ -269,7 +262,7 @@ function turnoBot() {
     const bot = players[currentPlayerIndex];
     if (!bot || bot.isHuman) return;
 
-    // buscar la primera carta jugable
+    // Buscar la primera carta jugable
     const top = discardPile[discardPile.length - 1];
     const cartaJugada = bot.cards.find(card =>
         card.color === top.color || card.value === top.value || card.type === 'wild'
@@ -278,13 +271,13 @@ function turnoBot() {
     if (cartaJugada) {
         playCard(currentPlayerIndex, cartaJugada);
         mostrarTodasLasManos();
-        mostrarCartaDescarte(true);
+        mostrarCartaDescarte();
         setTimeout(() => {
             nextTurn();
             mostrarTodasLasManos();
-            mostrarCartaDescarte(true);
-            turnoBot(); // por si hay varios bots seguidos
-        }, 2000); // espera de 2 segundos
+            mostrarCartaDescarte();
+            turnoBot(); // Por si hay varios bots seguidos
+        }, 700);
     } else {
         drawCard(currentPlayerIndex);
         mostrarTodasLasManos();
@@ -292,40 +285,33 @@ function turnoBot() {
             nextTurn();
             mostrarTodasLasManos();
             turnoBot();
-        }, 2000); // espera de 2 segundos
+        }, 700);
     }
 }
-//hola todo bien 
+
 function mostrarTodasLasManos() {
     const posiciones = ['mano-abajo', 'mano-izquierda', 'mano-arriba', 'mano-derecha'];
-    for (let i = 0; i < posiciones.length; i++) {
+    for (let i = 0; i < players.length; i++) {
         const div = document.getElementById(posiciones[i]);
         if (!div) continue;
-        // si hay menos jugadores que la posición, ocultar el div
-        if (i >= players.length) {
-            div.style.visibility = 'hidden';
-            div.style.pointerEvents = 'none';
-            continue;
-        } else {
-            div.style.visibility = 'visible';
-            div.style.pointerEvents = '';
-        }
         const manoDiv = div.querySelector('.div-mano');
         manoDiv.innerHTML = '';
         players[i].cards.forEach((card, idx) => {
             let img = document.createElement('img');
+            let div=document.createElement('div'); //linea nueva
             if (i === currentPlayerIndex) {
                 img.src = obtenerRutaImagen(card);
                 img.alt = `${card.value} ${card.color}`;
                 img.className = 'carta-img';
+                div.className='carta'; //linea nueva
                 img.style.cursor = 'pointer';
                 img.addEventListener('click', function() {
                     if (playCard(currentPlayerIndex, card)) {
                         mostrarTodasLasManos();
-                        mostrarCartaDescarte(true);
+                        mostrarCartaDescarte();
                         nextTurn();
                         mostrarTodasLasManos();
-                        mostrarCartaDescarte(true);
+                        mostrarCartaDescarte();
                         turnoBot();
                     }
                 });
@@ -333,10 +319,12 @@ function mostrarTodasLasManos() {
                 img.src = 'images/Cartas/carta trasera/carta_parte_trasera.png';
                 img.alt = 'Carta oculta';
                 img.className = 'carta-img';
+                div.className='carta'; //linea nueva
             }
-            manoDiv.appendChild(img);
+            div.appendChild(img); //linea nueva
+            manoDiv.appendChild(div); //meto el div
         });
-        // si es el jugador actual, agrego botón para robar carta SIEMPRE que no tenga jugada válida
+        // Si es el jugador actual, agrego botón para robar carta si no hay jugada válida
         if (i === currentPlayerIndex) {
             const puedeJugar = players[currentPlayerIndex].cards.some(card => {
                 const top = discardPile[discardPile.length - 1];
@@ -358,8 +346,7 @@ function mostrarTodasLasManos() {
                 }
             };
             manoDiv.appendChild(btnRoba);
-
-            // boton UNO si solo queda una carta y no ha dicho UNO
+            // Botón UNO si solo queda una carta y no ha dicho UNO
             if (
                 players[i].cards.length === 1 &&
                 players[i].isHuman &&
@@ -377,27 +364,28 @@ function mostrarTodasLasManos() {
             }
         }
     }
-    verificarFinPartida();
 }
 
-function mostrarCartaDescarte(animar = false) {
+function mostrarCartaDescarte() {
     const zonaDescarte = document.getElementById('zona-descarte');
-    zonaDescarte.innerHTML = 'DESCARTE';
+    zonaDescarte.innerHTML = '';//quité el descarte ed aquí
     if (discardPile.length > 0) {
         const carta = discardPile[discardPile.length - 1];
-        let img = document.createElement('img');
+        let img = document.createElement('img'); //linea nueva
+        let div=document.createElement('div');
         img.src = obtenerRutaImagen(carta);
         img.alt = `${carta.value} ${carta.color}`;
         img.className = 'carta-img';
-        if (animar) img.classList.add('carta-animada');
-        zonaDescarte.appendChild(img);
+        div.className='carta'; //linea nueva
+        div.appendChild(img); //linea nueva
+        zonaDescarte.appendChild(div); //meto el div
     }
-    // mostrar solo el recuadro de color
+    // Mostrar el color actual siempre
     let color = currentColor;
     if (!color && discardPile.length > 0) color = discardPile[discardPile.length-1].color;
     const colorBox = document.createElement('div');
     colorBox.className = `color-actual color-${color || 'ninguno'}`;
-    colorBox.textContent = 'Color';
+    colorBox.textContent = `Color actual: ${colorNombreEspanol(color)}`;
     zonaDescarte.appendChild(colorBox);
 }
 
@@ -407,7 +395,7 @@ function colorNombreEspanol(color) {
         green: 'Verde',
         blue: 'Azul',
         yellow: 'Amarillo'
-    }
+    }[color] || 'Ninguno';
 }
 
 function mostrarMazo() {
@@ -415,34 +403,49 @@ function mostrarMazo() {
     zonaMazo.innerHTML = '';
     if (deck.length > 0) {
         let img = document.createElement('img');
+        let div = document.createElement('div'); //linea nueva
         img.src = 'images/Cartas/carta trasera/carta_parte_trasera.png';
         img.alt = 'Mazo para robar';
         img.className = 'carta-img';
-        zonaMazo.appendChild(img);
-        zonaMazo.appendChild(document.createTextNode('BARAJA'));
+        div.className='carta'; //linea nueva
+        div.appendChild(img); //linea nueva
+        zonaMazo.appendChild(div); //meto el div en vez de la img
+        zonaMazo.appendChild(document.createTextNode(''));
     } else {
         zonaMazo.appendChild(document.createTextNode('BARAJA VACÍA'));
     }
 }
 
-function mostrarMensajeFinal() {
-    const modal = document.getElementById('fin-partida-modal');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    document.getElementById('ver-puntaje-btn').onclick = function() {
-        window.location.href = 'ResultadoJuego_index.html';
-    };
-}
+//A partir de acá es mostrar resultados
 
-// llama a esta función después de cada jugada para verificar si solo queda un jugador con cartas
-function verificarFinPartida() {
-    const jugadoresConCartas = players.filter(p => p.cards.length > 0);
-    if (jugadoresConCartas.length === 1) {
-        // agrego el último jugador al ranking si no está
-        if (!rankingSalida.includes(jugadoresConCartas[0].id)) {
-            rankingSalida.push(jugadoresConCartas[0].id);
-            localStorage.setItem('rankingSalida', JSON.stringify(rankingSalida));
-        }
-        mostrarMensajeFinal();
+function mostrarPuntaje(){
+    let intermedio=localStorage.getItem('players');
+    let jugadores=intermedio?JSON.parse(intermedio):[];
+    //let jugador;
+    //let puntos;
+    
+    let jugador=document.getElementById('1-nombre');
+    let puntaje=document.getElementById('1-puntaje');
+    for(let i=0; i<jugadores.length; i++){
+        if(i=0){
+            jugador=document.getElementById('1-nombre');
+            puntaje=document.getElementById('1-puntaje');
+            jugador.innerHTML=jugadores[i].name;
+            puntaje.innerHTML=jugadores[i].points;}
+        else if(i=1){
+            jugador=document.getElementById('2-nombre');
+            puntaje=document.getElementById('2-puntaje');
+            jugador.innerHTML=jugadores[i].name;
+            puntaje.innerHTML=jugadores[i].points;}
+        else if(i=2){
+            jugador=document.getElementById('3-nombre');
+            puntaje=document.getElementById('3-puntaje');
+            jugador.innerHTML=jugadores[i].name;
+            puntaje.innerHTML=jugadores[i].points;}
+        else if(i=3){
+            jugador=document.getElementById('4-nombre');
+            puntaje=document.getElementById('4-puntaje');
+            jugador.innerHTML=jugadores[i].name;
+            puntaje.innerHTML=jugadores[i].points;}
     }
 }
