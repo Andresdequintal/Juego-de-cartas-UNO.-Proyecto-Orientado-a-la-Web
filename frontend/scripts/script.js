@@ -1,4 +1,5 @@
-let deck=[];;
+let deck=[];
+let bombed=0;
 let discardPile=[];
 const colors=['red','green','blue','yellow'];
 const specialCards=['jump','reverse','draw2']
@@ -44,6 +45,9 @@ function initializeDeck(){
     for(let i=0; i<4; i++) {
         deck.push({color:null, type:'wild', value:'wild'});
         deck.push({color:null, type:'wild', value:'draw4'});
+    }
+    for(let i=0; i<2; i++) {
+        deck.push({color:null, type:'wild', value:'bomba'});
     }
     // Mezclar el mazo
     deck = deck.sort(()=>Math.random()-0.5);
@@ -174,7 +178,7 @@ function drawCard(playerIndex){
     const card = deck.pop();
     players[playerIndex].cards.push(card);
 }
-
+//
 function nextTurn(){
     for(let i=0; i<players.length; i++){
         if(players[i].cards.length==0){
@@ -254,6 +258,7 @@ function obtenerRutaImagen(card) {
     if (card.type === 'wild') {
         if (card.value === 'draw4') return 'images/Cartas/comodines generales/+4_comodin.png';
         if (card.value === 'wild') return 'images/Cartas/comodines generales/cambio_color.png';
+        if (card.value === 'bomba') return 'images/Cartas/comodines generales/carta_bomba.jpeg';
     }
     return '';
 }
