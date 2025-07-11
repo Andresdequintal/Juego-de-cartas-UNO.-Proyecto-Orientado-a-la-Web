@@ -416,6 +416,22 @@ function mostrarMazo() {
     }
 }
 
+function renderPoints(){
+    const ul=document.getElementById('lista-marcador')
+    ul.innerHTML=''
+
+    players.forEach((p,i)=>{
+        const li=document.createElement('li')
+        const nameSpan=document.createElement('span');
+        const pointSpan=document.createElement('span');
+
+        nameSpan.textContent=p.name+': ';
+        pointSpan.textContent=p.points;
+        li.appendChild(nameSpan)
+        li.appendChild(pointSpan)
+        ul.appendChild(li)
+    })
+}
 //A partir de acá es mostrar resultados
 
 function mostrarPuntaje(){
