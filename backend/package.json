@@ -1,0 +1,12 @@
+{
+  "name": "uno-backend",
+  "version": "1.0.0",
+  "description": "Servidor backend para el juego de cartas UNO",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+} 

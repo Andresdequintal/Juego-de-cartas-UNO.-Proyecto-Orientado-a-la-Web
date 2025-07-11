@@ -1,0 +1,1 @@
+// Funciones utilitarias del juego irán aquí 
