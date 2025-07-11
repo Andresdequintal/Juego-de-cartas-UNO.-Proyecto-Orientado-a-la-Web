@@ -36,7 +36,7 @@
                 <div class="opciones">
                     <ol>
                         <li><label for="powerup-1">Carta Bomba</label>
-                            <input type="checkbox" name="powerup-1" id="powerup-1" required>
+                            <input type="checkbox" name="powerup" id="bomba" value="true" required>
                         </li>
                         <ul>
                             <li>Se coloca en la zona de descarte y explota después de 3 turnos.</li>
@@ -44,28 +44,28 @@
                             <li><strong>Costo:</strong> -10 puntos.</li>
                         </ul>
                         <li><label for="powerup-2">Escudo</label>
-                            <input type="checkbox" name="powerup-2" id="powerup-2" required>
+                            <input type="checkbox" name="powerup" value="escudo" required>
                         </li>
                         <ul>
                             <li>Protege de cualquier penalización (+2, +4, bomba, etc.) por un turno</li>
                             <li><strong>Costo:</strong> -15 puntos.</li>
                         </ul>
                         <li><label for="powerup-3">Robo Forzado</label>
-                            <input type="checkbox" name="powerup-3" id="powerup-3" required>
+                            <input type="checkbox" name="powerup" value="Robo" required>
                         </li>
                         <ul>
                             <li>Fuerza a un oponente a intercambiar su mano contigo.</li>
                             <li><strong>Costo:</strong> -20 puntos</li>
                         </ul>
                         <li><label for="powerup-4">Carta Camaleón</label>
-                            <input type="checkbox" name="powerup-4" id="powerup-4" required>
+                            <input type="checkbox" name="powerup" value="Camaleon" required>
                         </li>
                         <ul>
                             <li>Se puede jugar en cualquier momento y copia la última carta jugada.</li>
                             <li><strong>Costo:</strong> -15 puntos</li>
                         </ul>
                         <li><label for="powerup-5">Rebote</label>
-                            <input type="checkbox" name="powerup-5" id="powerup-5" required>
+                            <input type="checkbox" name="powerup" value="Rebote" required>
                         </li>
                         <ul>
                             <li>Si te tiran un +2 o +4, puedes rebotarlo a otro jugador en vez de recibirlo.</li>
@@ -109,8 +109,12 @@
     document.querySelector('.botonPre').addEventListener('click', function(e) {
         const numJugadores = document.getElementById('jugadores').value;
         const tipoJuego = document.getElementById('tipo-juego').value;
+        const bomba = document.getElementById('bomba').checked;
+        
+
         localStorage.setItem('numJugadores', numJugadores);
         localStorage.setItem('tipoJuego', tipoJuego);
+        localStorage.setItem('bomba',bomba)
         // Mostrar pantalla de carga
         document.getElementById('pantalla-carga').style.display = 'flex';
         setTimeout(function() {
