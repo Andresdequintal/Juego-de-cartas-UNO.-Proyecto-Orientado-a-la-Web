@@ -11,40 +11,48 @@
 </head>
 <body id="body-mesa">
     <div class="mesa-grid">
-        <div class="espacio-grid" id="mano-arriba">Mano 1
+        <div class="espacio-grid" id="mano-arriba">
             <div class="div-mano">
-                <div class="carta" id="R-5"><img src="images\Cartas\5_rojo.png" alt="R-5"></div>
-                <div class="carta" id="R-4"><img src="images\Cartas\4_rojo.png" alt="R-4"></div>
-                <div class="carta" id="R-3"><img src="images\Cartas\3_rojo.png" alt="R-3"></div>
+                <!--<img class="carta-img"  src="images\Cartas\cartas rojas\5_rojo.png" alt="R-5">
+                <img class="carta-img"  src="images\Cartas\cartas rojas\4_rojo.png" alt="R-4">
+                <img class="carta-img"  src="images\Cartas\cartas rojas\3_rojo.png" alt="R-3">
+
+                <img class="carta-img" src="images\Cartas\cartas rojas\5_rojo.png" alt="R-5">
+                <img class="carta-img" src="images\Cartas\cartas rojas\4_rojo.png" alt="R-4">
+                <img class="carta-img" src="images\Cartas\cartas rojas\3_rojo.png" alt="R-3">
+                <img class="carta-img" src="images\Cartas\cartas rojas\5_rojo.png" alt="R-5">
+                <img class="carta-img" src="images\Cartas\cartas rojas\4_rojo.png" alt="R-4">
+                <img class="carta-img" src="images\Cartas\cartas rojas\3_rojo.png" alt="R-3">-->
             </div>
         </div>
-        <div class="espacio-grid" id="mano-izquierda">Mano 2
+        <div class="espacio-grid" id="mano-izquierda">
             <div class="div-mano">
-                <div class="carta" id="R-5"><img src="images\Cartas\5_rojo.png" alt="R-5"></div>
-                <div class="carta" id="R-4"><img src="images\Cartas\4_rojo.png" alt="R-4"></div>
-                <div class="carta" id="R-3"><img src="images\Cartas\3_rojo.png" alt="R-3"></div>
+                <!--<img class="carta-img" src="images\Cartas\cartas rojas\5_rojo.png" alt="R-5">
+                <img class="carta-img" src="images\Cartas\cartas rojas\4_rojo.png" alt="R-4">
+                <img class="carta-img" src="images\Cartas\cartas rojas\3_rojo.png" alt="R-3">-->
             </div>
         </div>
-        <div class="espacio-grid" id="mano-derecha">Mano 3
+        <div class="espacio-grid" id="mano-derecha">
             <div class="div-mano">
-                <div class="carta" id="R-5"><img src="images\Cartas\5_rojo.png" alt="R-5"></div>
-                <div class="carta" id="R-4"><img src="images\Cartas\4_rojo.png" alt="R-4"></div>
-                <div class="carta" id="R-3"><img src="images\Cartas\3_rojo.png" alt="R-3"></div>
+                <!--<img class="carta-img" src="images\Cartas\cartas rojas\5_rojo.png" alt="R-5">
+                <img class="carta-img" src="images\Cartas\cartas rojas\4_rojo.png" alt="R-4">
+                <img class="carta-img" src="images\Cartas\cartas rojas\3_rojo.png" alt="R-3">-->
             </div>
         </div>
-        <div class="espacio-grid" id="mano-abajo">Mano 4
+        <div class="espacio-grid" id="mano-abajo">
             <div class="div-mano">
-                <div class="carta" id="R-5"><img src="images\Cartas\5_rojo.png" alt="R-5"></div>
-                <div class="carta" id="R-4"><img src="images\Cartas\4_rojo.png" alt="R-4"></div>
-                <div class="carta" id="R-3"><img src="images\Cartas\3_rojo.png" alt="R-3"></div>
+                <!--<img src="images\Cartas\cartas rojas\5_rojo.png" alt="R-5">
+                <img src="images\Cartas\cartas rojas\4_rojo.png" alt="R-4">
+                <img src="images\Cartas\cartas rojas\3_rojo.png" alt="R-3">-->
             </div>
         </div>
-        <div class="espacio-grid" id="zona-descarte">Descarte</div>
-        <div class="espacio-grid" id="zona-baraja">baraja</div>
+        <div class="espacio-grid" id="zona-descarte"></div>
+        <div class="espacio-grid" id="zona-baraja"></div>
         <div class="espacio-grid" id="div7"></div>
         <div class="espacio-grid" id="div8"></div>
         <div class="espacio-grid" id="div9"></div>
     </div>
+    <button class="botonJuego" onclick="window.location.href='ResultadoJuego_index.html'">boton</button>
     <div id="selector-color" style="display:none;">
         <div class="selector-color-box">
             <span>Elige un color:</span>
@@ -52,12 +60,6 @@
             <button class="color-btn" data-color="green" style="background:#27ae60;">Verde</button>
             <button class="color-btn" data-color="blue" style="background:#2980b9;">Azul</button>
             <button class="color-btn" data-color="yellow" style="background:#f9c80e; color:#333;">Amarillo</button>
-        </div>
-    </div>
-    <div id="fin-partida-modal" class="fin-partida-modal" style="display:none;">
-        <div class="fin-partida-box">
-            <div class="fin-partida-titulo">Partida finalizada</div>
-            <button id="ver-puntaje-btn" class="fin-partida-btn">Ver puntaje</button>
         </div>
     </div>
     <script src="scripts/script.js"></script>
