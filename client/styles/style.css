@@ -49,6 +49,54 @@ body {
 
 /* <+++++++++++++++Inicio +++++++++++++++> */
 
+#header-inicio{
+    margin-top: 0;
+    width: 100%;
+    background-color: #333;
+}
+
+h3{
+    color:#f2f2f2;
+}
+
+#div-header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.li-inicio{
+    color: #f2f2f2;
+    font-size: 1.25rem;
+}
+
+.ul-inicio{
+    list-style: none;
+}
+
+#body-inicio{
+    font-family: 'very_simple_chalk', sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width:100%;
+    background-color: #f0f0f0;
+    background-image: url('/client/images/0553d9d2ae7e576b66d34a1e0df8eab6.jpg');
+    /* background-size: cover; */
+    /* background-attachment: fixed; */
+}
+
+#main-inicio{
+    font-family: 'very_simple_chalk', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width:100%;
+}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -137,7 +185,7 @@ button:hover {
 
 /* <+++++++++++++++Juego +++++++++++++++> */
 
-.container-mano {
+.espacio-grid {
     border: #333 solid;
     border-radius: 10px;
     padding: 10px 15px;
@@ -146,15 +194,12 @@ button:hover {
 .mesa-grid {
     height: 80vh;
     width: 100vw;
-    max-width: 100vw;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 5px;
     padding: 5px;
-    box-sizing: border-box;
-    overflow-x: hidden;
-}
+    }
     #zona-baraja { grid-area: 1 / 1 / 2 / 2; }
     #mano-arriba { grid-area: 1 / 2 / 2 / 3; }
     #mano-derecha { grid-area: 2 / 3 / 3 / 4; }
@@ -168,7 +213,7 @@ button:hover {
 .mesa-grid > div {
     border: 3px #333 solid;
     border-radius: 10px;
-    padding: 10px;
+    padding: 20px;
     background-color: rgba(255, 255, 255, 0.74);
     display: flex;
     justify-content: center;
@@ -176,9 +221,6 @@ button:hover {
     font-size: 1.5rem;
     font-weight: bold;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    min-width: 0;
-    min-height: 0;
-    overflow-x: auto;
 }
 
 .botonJuego {
@@ -189,61 +231,53 @@ button:hover {
 .div-mano{
     height: 100%;
     width: 100%;
-    overflow-x: auto;
     display: flex;
     flex-wrap: nowrap;
-    gap: 1px;
-    justify-content: flex-start;
+    gap:2px;
+    justify-content: center;
     align-items: center;
-    box-sizing: border-box;
-    padding-bottom: 30px;
-    position: relative;
+    /*Superposicion de las cartas*/
+    overflow:visible;
 }
 
-.carta img{
+/*.carta img{
     width: 100%;
     height: 100%;
     object-fit: contain;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}*/
+
+.carta-img {
+    width: 100%; /*ambos a 100%*/
+    height: 100%;
+    object-fit: contain;
+    margin: 0 2px;
+    display: inline-block;
+}
+
+.carta{
+    /*Superposicion de las cartas*/
+    max-height: 120px;
+    margin-left: -40px;
+    position:relative;
+    transition: transform 0.3s, margin 0.3s;
+}
+
+.carta:first-child{
+    /*Superposicion de las cartas*/
+    margin-left: 0; /*Sin margen negativo en la primera carta*/
+}
+
+.carta .carta-img{
+    width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 10px;
     /*object-fit: cover;*/
     object-position: center;
     display: block;
-}
-
-.carta-img {
-    width: 40px;
-    height: 60px;
-    object-fit: contain;
-    margin: 0 1px;
-    display: inline-block;
-    flex-shrink: 0;
-}
-
-.carta-img:hover {
-    transform: scale(1.15) translateY(-6px);
-    box-shadow: 0 6px 18px #0002;
-    z-index: 5;
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.boton-uno, .div-mano > button {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    z-index: 2;
-    margin: 0;
-}
-
-.boton-uno {
-    left: 2px;
-    right: auto;
-}
-
-.div-mano > button:not(.boton-uno) {
-    font-size: 1em;
-    padding: 10px 18px;
-    min-width: 120px;
-    min-height: 40px;
-    border-radius: 8px;
 }
 
 /* <+++++++++++++++ResultadoJuego +++++++++++++++> */
@@ -360,7 +394,6 @@ td:first-child {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: background 0.2s;
 }
-
 .boton-uno:hover {
     background: #eeb701;
 }
@@ -379,127 +412,3 @@ td:first-child {
 .color-blue { background: #2980b9; }
 .color-yellow { background: #f9c80e; color: #333; }
 .color-ninguno { background: #fff; color: #333; }
-
-@keyframes lanzar-carta {
-    0% { transform: scale(1) rotate(0deg); box-shadow: 0 0 0 #0000; }
-    50% { transform: scale(1.2) rotate(-10deg); box-shadow: 0 8px 24px #0003; }
-    100% { transform: scale(1) rotate(0deg); box-shadow: 0 0 0 #0000; }
-}
-.carta-animada {
-    animation: lanzar-carta 0.4s cubic-bezier(.4,2,.6,1) 1;
-    z-index: 10;
-}
-
-.decoracion-esquina {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    width: 400px;
-    height: auto;
-    z-index: 10;
-    pointer-events: none;
-}
-
-.decoracion-esquina-der {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width: 400px;
-    height: auto;
-    z-index: 10;
-    pointer-events: none;
-}
-
-body, html {
-    width: 100vw;
-    max-width: 100vw;
-    overflow-x: hidden;
-}
-
-.footer-index {
-    width: 100vw;
-    max-width: 100vw;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18px 40px 12px 40px;
-    background: rgba(255,255,255,0.85);
-    border-top: 2px solid #ccc;
-    font-family: 'very_simple_chalk', sans-serif;
-    font-size: 1.1em;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    z-index: 100;
-    box-sizing: border-box;
-}
-.footer-left {
-    font-weight: bold;
-    color: #333;
-}
-.footer-right {
-    display: flex;
-    gap: 18px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-.footer-right li {
-    color: #555;
-    font-weight: 500;
-}
-
-.fin-partida-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 3000;
-}
-.fin-partida-box {
-    background: #fff;
-    padding: 40px 30px;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px #0002;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-}
-.fin-partida-titulo {
-    font-size: 2em;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #222;
-}
-.fin-partida-btn {
-    background: #f9c80e;
-    color: #fff;
-    font-size: 1.2em;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'very_simple_chalk', sans-serif;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-.fin-partida-btn:hover {
-    background: #eeb701;
-}
-
-.primer-lugar {
-    background: #fffbe6 !important;
-    font-weight: bold;
-    font-size: 1.15em;
-    box-shadow: 0 2px 12px #f9c80e44;
-}
-.table-resultados td:first-child {
-    font-size: 1.2em;
-    letter-spacing: 1px;
-}
-.table-resultados td {
-    vertical-align: middle;
-}
