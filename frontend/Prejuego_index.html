@@ -36,7 +36,7 @@
                 <div class="opciones">
                     <ol>
                         <li><label for="powerup-1">Carta Bomba</label>
-                            <input type="checkbox" name="powerup" id="bomba" value="true" required>
+                            <input type="checkbox" name="powerup" id="bomba" required>
                         </li>
                         <ul>
                             <li>Se coloca en la zona de descarte y explota después de 3 turnos.</li>
@@ -44,28 +44,28 @@
                             <li><strong>Costo:</strong> -10 puntos.</li>
                         </ul>
                         <li><label for="powerup-2">Escudo</label>
-                            <input type="checkbox" name="powerup" value="escudo" required>
+                            <input type="checkbox" name="powerup" id="escudo" required>
                         </li>
                         <ul>
                             <li>Protege de cualquier penalización (+2, +4, bomba, etc.) por un turno</li>
                             <li><strong>Costo:</strong> -15 puntos.</li>
                         </ul>
                         <li><label for="powerup-3">Robo Forzado</label>
-                            <input type="checkbox" name="powerup" value="Robo" required>
+                            <input type="checkbox" name="powerup" id="robo" required>
                         </li>
                         <ul>
                             <li>Fuerza a un oponente a intercambiar su mano contigo.</li>
                             <li><strong>Costo:</strong> -20 puntos</li>
                         </ul>
                         <li><label for="powerup-4">Carta Camaleón</label>
-                            <input type="checkbox" name="powerup" value="Camaleon" required>
+                            <input type="checkbox" name="powerup" id="camaleon" required>
                         </li>
                         <ul>
                             <li>Se puede jugar en cualquier momento y copia la última carta jugada.</li>
                             <li><strong>Costo:</strong> -15 puntos</li>
                         </ul>
                         <li><label for="powerup-5">Rebote</label>
-                            <input type="checkbox" name="powerup" value="Rebote" required>
+                            <input type="checkbox" name="powerup" id="rebote" required>
                         </li>
                         <ul>
                             <li>Si te tiran un +2 o +4, puedes rebotarlo a otro jugador en vez de recibirlo.</li>
@@ -97,24 +97,32 @@
                     </ul>
                 </div>
             </div>
-        </section>
+        </section><!---->
         <button class="botonPre" onclick="window.location.href='Juego_index.html'">Comenzar juego</button>
     </div>
-   
+
     <div id="pantalla-carga" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#fff; z-index:2000; justify-content:center; align-items:center;">
         <img src="images/imagenes decorativas/pantalla_carga.png" alt="Cargando..." style="max-width:60vw; max-height:60vh;">
     </div>
-   
+
     <script>
     document.querySelector('.botonPre').addEventListener('click', function(e) {
         const numJugadores = document.getElementById('jugadores').value;
         const tipoJuego = document.getElementById('tipo-juego').value;
         const bomba = document.getElementById('bomba').checked;
-        
+        const escudo = document.getElementById('escudo').checked;
+        const robo = document.getElementById('robo').checked;
+        const camaleon = document.getElementById('camaleon').checked;
+        const rebote = document.getElementById('rebote').checked;
 
         localStorage.setItem('numJugadores', numJugadores);
         localStorage.setItem('tipoJuego', tipoJuego);
         localStorage.setItem('bomba',bomba)
+        localStorage.setItem('escudo',escudo)
+        localStorage.setItem('robo',robo)
+        localStorage.setItem('camaleon',camaleon)
+        localStorage.setItem('rebote',rebote)
+        
         // Mostrar pantalla de carga
         document.getElementById('pantalla-carga').style.display = 'flex';
         setTimeout(function() {
