@@ -59,7 +59,7 @@
         <div class="espacio-grid" id="div8"></div>
         <div class="espacio-grid" id="div9"></div>
     </div>
-    <button class="botonJuego" onclick="window.location.href='ResultadoJuego_index.html'">boton</button>
+    <button class="botonJuego" onclick="window.location.href='ResultadoJuego_index.html'">Inicio</button>
     <div id="selector-color" style="display:none;">
         <div class="selector-color-box">
             <span>Elige un color:</span>
@@ -70,16 +70,16 @@
         </div>
     </div>
     <script src="scripts/script.js"></script>
-    <!-- Elimino el script inline que inicia la partida automáticamente -->
-    <!-- <script>
+    <script>
     window.onload = function() {
         const numJugadores = localStorage.getItem('numJugadores') || 4;
-        startGame(Number(numJugadores));
+        const tipoJuego= localStorage.getItem('tipoJuego')
+        startGame(Number(numJugadores), tipoJuego);
         mostrarTodasLasManos();
         mostrarCartaDescarte();
         mostrarMazo();
         renderPoints();
     };
-    </script> -->
+    </script>
 </body>
 </html>
