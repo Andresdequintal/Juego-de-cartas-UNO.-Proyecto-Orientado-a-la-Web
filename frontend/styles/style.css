@@ -557,6 +557,74 @@ body, html {
     font-size: 1.2em;
     letter-spacing: 1px;
 }
+
 .table-resultados td {
     vertical-align: middle;
+}
+
+.modo-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    width: 90vw;
+    max-width: 1400px;
+    margin: 40px auto;
+    min-height: 80vh;
+}
+
+.modo-col {
+    flex: 1 1 0;
+    background: rgba(255,255,255,0.85);
+    border-radius: 18px;
+    box-shadow: 0 4px 16px #0002;
+    padding: 40px 32px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 350px;
+    max-width: 600px;
+    margin: 0 10px;
+}
+
+.modo-col h2 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #f9c80e;
+    text-shadow: 1px 2px 0 #fffbe6, 0 2px 8px #f9c80e44;
+    letter-spacing: 1px;
+}
+
+.modo-col button, .modo-col select, .modo-col input[type="text"] {
+    margin: 12px 0;
+    width: 80%;
+    max-width: 350px;
+}
+
+.modo-col label {
+    font-size: 1.1em;
+    margin-right: 10px;
+}
+
+.modo-col input[type="text"] {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #f9c80e;
+    font-family: 'very_simple_chalk', sans-serif;
+    font-size: 1.1em;
+    background: #fffbe6;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 900px) {
+    .modo-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 24px;
+    }
+    .modo-col {
+        max-width: 100%;
+        min-width: unset;
+    }
 }
