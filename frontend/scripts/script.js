@@ -47,7 +47,8 @@ function initializeDeck(){
         deck.push({color:null, type:'wild', value:'draw4'});
     }
     for(let i=0; i<2; i++) {
-        deck.push({color:null, type:'wild', value:'bomba'});
+        console.log(localStorage.getItem('bomba'))
+        if(localStorage.getItem('bomba')==='true'){deck.push({color:null, type:'wild', value:'bomba'})};
     }
     // Mezclar el mazo
     deck = deck.sort(()=>Math.random()-0.5);
