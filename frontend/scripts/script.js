@@ -478,3 +478,234 @@ function mostrarPuntaje(){
             puntaje.innerHTML=jugadores[i].points;}
     }
 }
+
+let gameId = null;
+let ws = null;
+let gameState = null;
+
+function startGameClient() {
+    fetch('http://localhost:3001/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        gameId = data.gameId;
+        gameState = data;
+        connectWebSocket(gameId);
+        updateGameStateUI(data);
+        // Mostrar el gameId en la UI
+        const gameIdDiv = document.getElementById('current-game-id');
+        if (gameIdDiv) gameIdDiv.textContent = 'ID de partida: ' + gameId;
+    });
+}
+
+function connectWebSocket(gameId) {
+    ws = new WebSocket('ws://localhost:3001');
+    ws.onopen = () => {
+        ws.send(JSON.stringify({ type: 'subscribe', gameId }));
+    };
+    ws.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+        handleWebSocketEvent(msg);
+    };
+    ws.onclose = () => {
+        console.log('WebSocket closed');
+    };
+}
+
+function showNotification(message, type = 'info') {
+    let notif = document.getElementById('notification-area');
+    if (!notif) {
+        notif = document.createElement('div');
+        notif.id = 'notification-area';
+        notif.style.position = 'fixed';
+        notif.style.top = '20px';
+        notif.style.left = '50%';
+        notif.style.transform = 'translateX(-50%)';
+        notif.style.zIndex = '1000';
+        notif.style.background = '#fffbe6';
+        notif.style.border = '1px solid #e0c200';
+        notif.style.padding = '12px 24px';
+        notif.style.borderRadius = '8px';
+        notif.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        notif.style.fontWeight = 'bold';
+        notif.style.fontSize = '1.1em';
+        notif.style.display = 'none';
+        document.body.appendChild(notif);
+    }
+    notif.textContent = message;
+    notif.style.display = 'block';
+    setTimeout(() => {
+        notif.style.display = 'none';
+    }, type === 'alert' ? 4000 : 2000);
+}
+
+function highlightTurn(turn) {
+    // Resalta el nombre del jugador actual
+    for (let i = 0; i < 4; i++) {
+        const playerLabel = document.getElementById('player-label-' + (i + 1));
+        if (playerLabel) {
+            playerLabel.style.fontWeight = (i === turn) ? 'bold' : 'normal';
+            playerLabel.style.color = (i === turn) ? '#1a73e8' : '';
+            playerLabel.style.textShadow = (i === turn) ? '0 0 8px #fff' : '';
+        }
+    }
+}
+
+function updateGameStateUI(state) {
+    gameState = state;
+    renderPlayerCards(state.clientCards);
+    renderTurn(state.turn);
+    renderScores(state.scores);
+    updateUnoButton(state.clientCards);
+    highlightTurn(state.turn);
+    // Add more UI updates as needed
+}
+
+function isCardPlayable(card) {
+    const top = gameState.discardPile;
+    const colorToMatch = gameState.currentColor || top.color;
+    return (
+        card.color === colorToMatch ||
+        card.value === top.value ||
+        card.type === 'wild'
+    );
+}
+
+function playCardClient(card, chosenColor = null) {
+    if (!isCardPlayable(card)) {
+        alert('You cannot play this card');
+        return;
+    }
+    fetch('http://localhost:3001/play', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameId, card, chosenColor })
+    });
+}
+
+function canDrawCard() {
+    if (gameState.turn !== 0) return false; // Only if it's your turn
+    return !gameState.clientCards.some(isCardPlayable);
+}
+
+function drawCardClient() {
+    if (!canDrawCard()) {
+        alert('You cannot draw a card now');
+        return;
+    }
+    fetch('http://localhost:3001/draw', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameId })
+    });
+}
+
+function updateUnoButton(cards) {
+    const btnUno = document.getElementById('btn-uno');
+    if (!btnUno) return;
+    btnUno.disabled = !(cards.length === 1);
+}
+
+function sayUnoClient() {
+    fetch('http://localhost:3001/uno', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameId })
+    });
+}
+
+function handleWebSocketEvent(msg) {
+    if (msg.gameState) {
+        updateGameStateUI(msg.gameState);
+    }
+    // Notificaciones y marcador
+    if (msg.type === 'round_score') {
+        showNotification(`¡Fin de ronda! Ganador: ${msg.winner}. Puntos: ${msg.roundScore}. Marcador: ${msg.scores.join(', ')}`, 'alert');
+    }
+    if (msg.type === 'client_play') {
+        showNotification(`${msg.player} jugó una carta`, 'info');
+    }
+    if (msg.type === 'client_draw_from_deck') {
+        showNotification(`${msg.player} tomó una carta del mazo`, 'info');
+    }
+    if (msg.type === 'client_uno') {
+        showNotification(`${msg.player} dijo ¡UNO!`, 'info');
+    }
+    if (msg.type === 'uno_warning') {
+        showNotification('¡Solo te queda una carta, tienes 4 segundos para cantar UNO!', 'alert');
+    }
+    if (msg.type === 'uno_penalty') {
+        showNotification('Has sido penalizado por no cantar UNO', 'alert');
+    }
+    if (msg.type === 'draw_penalty') {
+        showNotification(`${msg.affectedPlayer} recibió una penalización de ${msg.amount} cartas`, 'alert');
+    }
+    if (msg.type === 'bot_play') {
+        showNotification(`${msg.player} (bot) jugó una carta`, 'info');
+    }
+    if (msg.type === 'bot_draw_from_deck') {
+        showNotification(`${msg.player} (bot) tomó una carta del mazo`, 'info');
+    }
+    if (msg.type === 'bot_uno') {
+        showNotification(`${msg.player} (bot) dijo ¡UNO!`, 'info');
+    }
+}
+
+function renderScores(scores) {
+    const scoreboard = document.getElementById('scoreboard');
+    if (!scoreboard) return;
+    scoreboard.innerHTML = scores.map((s, i) => `Player ${i+1}: ${s}`).join('<br>');
+}
+
+function renderPlayerCards(cards) {
+    const handDiv = document.getElementById('player-hand');
+    if (!handDiv) return;
+    handDiv.innerHTML = '';
+    cards.forEach(card => {
+        let cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+        cardDiv.textContent = `${card.value} ${card.color || ''}`;
+        cardDiv.onclick = () => playCardClient(card);
+        handDiv.appendChild(cardDiv);
+    });
+}
+
+function renderTurn(turn) {
+    const turnDiv = document.getElementById('turn-info');
+    if (!turnDiv) return;
+    turnDiv.textContent = `Current turn: Player ${turn + 1}`;
+}
+
+function restartGameClient() {
+    startGameClient();
+}
+
+function joinExistingGame() {
+    const input = document.getElementById('join-game-id');
+    const id = input.value.trim();
+    if (!id) {
+        alert('Por favor ingresa un ID de partida válido');
+        return;
+    }
+    gameId = id;
+    connectWebSocket(gameId);
+    // Mostrar el gameId en la UI
+    const gameIdDiv = document.getElementById('current-game-id');
+    if (gameIdDiv) gameIdDiv.textContent = 'ID de partida: ' + gameId;
+}
+
+// Attach event listeners to buttons
+window.onload = () => {
+    const btnStart = document.getElementById('btn-start');
+    if (btnStart) btnStart.onclick = startGameClient;
+    const btnDraw = document.getElementById('btn-draw');
+    if (btnDraw) btnDraw.onclick = drawCardClient;
+    const btnUno = document.getElementById('btn-uno');
+    if (btnUno) btnUno.onclick = sayUnoClient;
+    const btnRestart = document.getElementById('btn-restart');
+    if (btnRestart) btnRestart.onclick = restartGameClient;
+    const btnJoin = document.getElementById('btn-join-game');
+    if (btnJoin) btnJoin.onclick = joinExistingGame;
+};
