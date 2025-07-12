@@ -143,6 +143,18 @@ function playCard(playerIndex, card) {
                 if (players[playerIndex].isHuman) {
                     mostrarSelectorColor(function(color) {
                         currentColor = color;
+                        if(card.value==='escudo'){
+                            players[playerIndex].points-=15
+                        }
+                        if(card.value==='robo'){
+                            players[playerIndex].points-=20
+                        }
+                        if(card.value==='rebote'){
+                            players[playerIndex].points-=10
+                        }
+                        if(card.value==='bomba'){
+                            players[playerIndex].points-=10
+                        }
                         if (card.value === 'draw4') {
                             const next = (currentPlayerIndex + direction + players.length) % players.length;
                             drawCard(next);
