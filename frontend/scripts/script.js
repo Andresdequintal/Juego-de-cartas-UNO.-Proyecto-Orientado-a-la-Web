@@ -85,7 +85,12 @@ function dealCards(){
             players[i].cards.push(deck.pop());
         }
     }
-    // Pone la primera carta en el descarte
+    // Pone la primera carta en el descarte (que no sea wild)
+    let top = deck[deck.length - 1];
+    while(top.type==='wild'){
+        deck = deck.sort(()=>Math.random()-0.5);
+        top = deck[deck.length - 1];
+    }
     discardPile = [deck.pop()];
 }
 
@@ -112,6 +117,10 @@ function playCard(playerIndex, card) {
         const idx = players[playerIndex].cards.findIndex(c => c === card);
         if (idx !== -1) {
             players[playerIndex].cards.splice(idx, 1);
+            if(card.value==='camaleon'){
+                card=top
+                players[playerIndex].points-=15
+            }
             discardPile.push(card);
 
             if (card.type === 'special') {
@@ -195,6 +204,7 @@ function nextTurn(){
         window.location.href='ResultadoJuego_index.html';
     }else{
         currentPlayerIndex = (currentPlayerIndex + direction + players.length) % players.length;
+        renderPoints();
     }
 }
 
