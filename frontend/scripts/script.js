@@ -79,8 +79,7 @@ function startGame(numPlayers, tipoJuego) {
       cards: [],
       points: 0,
       saidUNO: false,
-      isHuman:
-        tipoJuego === "humanos" ? true : tipoJuego === "bots" ? i === 0 : false,
+      isHuman: tipoJuego === 'humanos' ? true : (i === 0)
     });
   }
   console.log("Array de jugadores:", players); // Depuración
@@ -166,9 +165,9 @@ function playCard(playerIndex, card) {
             if (card.value === "rebote") {
               players[playerIndex].points -= 10;
             }
-            if (card.value === "bomba") {
-              bomb += 4;
-              players[playerIndex].points -= 10;
+            if(card.value==='bomba'){
+              bomb+=4;
+              players[playerIndex].points-=10
             }
             if (card.value === "draw4") {
               const next =
@@ -226,6 +225,7 @@ function drawCard(playerIndex) {
 }
 //
 function nextTurn() {
+  const alertaBomba=document.getElementById('bomba')
   for (let i = 0; i < players.length; i++) {
     if (players[i].cards.length == 0) {
       over = true;
@@ -243,17 +243,16 @@ function nextTurn() {
   } else {
     currentPlayerIndex =
       (currentPlayerIndex + direction + players.length) % players.length;
-    if (bomb > 0) {
-      bomb -= 1;
-      alertaBomba.classList.add("block");
-      alertaBomba.textContent =
-        "Quedan " + bomb + " turnos para que reviente la bomba!";
-      if (bomb === 0) {
-        drawCard(currentPlayerIndex);
-        drawCard(currentPlayerIndex);
-        drawCard(currentPlayerIndex);
-        alertaBomba.classList.remove("block");
-      }
+      if(bomb>0){
+        bomb-=1;
+        alertaBomba.classList.add('block')
+        alertaBomba.textContent='Quedan '+bomb+' turnos para que reviente la bomba!'
+        if(bomb===0){
+            drawCard(currentPlayerIndex)
+            drawCard(currentPlayerIndex)
+            drawCard(currentPlayerIndex)
+            alertaBomba.classList.remove('block')
+        }
     }
     renderPoints();
   }
