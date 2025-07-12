@@ -140,6 +140,47 @@ const server = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(serializeGameState(gameState)));
     });
+  } else if (req.method === 'POST' && req.url === '/join') {
+    parseBody(req, (err, body) => {
+      if (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+        return;
+      }
+      const { gameId } = body;
+      const gameState = games[gameId];
+      if (!gameState) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Game not found' }));
+        return;
+      }
+      // Añadir un nuevo jugador
+      const playerNum = gameState.players.length + 1;
+      const newPlayer = {
+        id: 'player' + playerNum,
+        name: 'Player ' + playerNum,
+        cards: [],
+        points: 0,
+        saidUNO: false,
+        isHuman: true
+      };
+      // Repartir 7 cartas al nuevo jugador
+      for (let j = 0; j < 7; j++) {
+        if (gameState.deck.length > 0) {
+          newPlayer.cards.push(gameState.deck.pop());
+        }
+      }
+      gameState.players.push(newPlayer);
+      gameState.scores.push(0);
+      // Notificar a todos los clientes conectados
+      broadcast(gameId, {
+        type: 'player_joined',
+        player: newPlayer.name,
+        gameState: serializeGameState(gameState)
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(serializeGameState(gameState)));
+    });
   } else {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('UNO server is running!');

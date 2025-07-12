@@ -57,20 +57,21 @@ function initializeDeck(){
     deck = deck.sort(()=>Math.random()-0.5);
 }
 
-function startGame(numPlayers){
-    over=false;
+function startGame(numPlayers, tipoJuego) {
+    over = false;
     players = [];
-    const tipoJuego = localStorage.getItem('tipoJuego') || 'bots';
-    for(let i=0; i<numPlayers; i++){
+    console.log('Tipo de juego seleccionado:', tipoJuego); // Depuración
+    for (let i = 0; i < numPlayers; i++) {
         players.push({
-            id: 'player'+(i+1),
-            name: 'Jugador '+(i+1),
+            id: 'player' + (i + 1),
+            name: 'Jugador ' + (i + 1),
             cards: [],
             points: 0,
             saidUNO: false,
-            isHuman: tipoJuego === 'humanos' ? true : (i === 0)
+            isHuman: (tipoJuego === 'humanos') ? true : (tipoJuego === 'bots' ? (i === 0) : false)
         });
     }
+    console.log('Array de jugadores:', players); // Depuración
     currentPlayerIndex = 0;
     direction = 1;
     initializeDeck();
@@ -505,10 +506,33 @@ let gameId = null;
 let ws = null;
 let gameState = null;
 
+// 1. Mostrar el gameId en la pantalla de juego (Juego_index.html)
+function mostrarGameIdEnJuego(gameId) {
+    let gameIdDiv = document.getElementById('game-id-info');
+    if (!gameIdDiv) {
+        gameIdDiv = document.createElement('div');
+        gameIdDiv.id = 'game-id-info';
+        gameIdDiv.style.position = 'fixed';
+        gameIdDiv.style.top = '10px';
+        gameIdDiv.style.right = '10px';
+        gameIdDiv.style.background = 'rgba(255,255,255,0.9)';
+        gameIdDiv.style.border = '2px solid #f9c80e';
+        gameIdDiv.style.borderRadius = '10px';
+        gameIdDiv.style.padding = '12px 24px';
+        gameIdDiv.style.fontFamily = "'very_simple_chalk', sans-serif";
+        gameIdDiv.style.fontSize = '1.2em';
+        gameIdDiv.style.zIndex = '2000';
+        document.body.appendChild(gameIdDiv);
+    }
+    gameIdDiv.textContent = 'ID de partida: ' + gameId;
+}
+
+// 2. Modificar startGameClient para crear partida con 1 jugador
 function startGameClient() {
     fetch('http://localhost:3001/start', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numPlayers: 1 }) // Solo el host al inicio
     })
     .then(res => res.json())
     .then(data => {
@@ -516,7 +540,8 @@ function startGameClient() {
         gameState = data;
         connectWebSocket(gameId);
         updateGameStateUI(data);
-        // Mostrar el gameId en la UI
+        mostrarGameIdEnJuego(gameId); // Mostrar el gameId en la pantalla de juego
+        // Mostrar el gameId en la UI de lobby si existe
         const gameIdDiv = document.getElementById('current-game-id');
         if (gameIdDiv) gameIdDiv.textContent = 'ID de partida: ' + gameId;
     });
@@ -575,6 +600,7 @@ function highlightTurn(turn) {
     }
 }
 
+// 4. Llamar mostrarGameIdEnJuego también cuando se actualiza el estado del juego
 function updateGameStateUI(state) {
     gameState = state;
     renderPlayerCards(state.clientCards);
@@ -582,6 +608,7 @@ function updateGameStateUI(state) {
     renderScores(state.scores);
     updateUnoButton(state.clientCards);
     highlightTurn(state.turn);
+    if (state.gameId) mostrarGameIdEnJuego(state.gameId);
     // Add more UI updates as needed
 }
 
@@ -704,6 +731,7 @@ function restartGameClient() {
     startGameClient();
 }
 
+// 3. Modificar joinExistingGame para que el jugador se una a la partida y se añada automáticamente
 function joinExistingGame() {
     const input = document.getElementById('join-game-id');
     const id = input.value.trim();
@@ -712,22 +740,37 @@ function joinExistingGame() {
         return;
     }
     gameId = id;
-    connectWebSocket(gameId);
-    // Mostrar el gameId en la UI
-    const gameIdDiv = document.getElementById('current-game-id');
-    if (gameIdDiv) gameIdDiv.textContent = 'ID de partida: ' + gameId;
+    // Lógica para notificar al backend que se añade un nuevo jugador
+    fetch('http://localhost:3001/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        connectWebSocket(gameId);
+        updateGameStateUI(data);
+        mostrarGameIdEnJuego(gameId);
+        const gameIdDiv = document.getElementById('current-game-id');
+        if (gameIdDiv) gameIdDiv.textContent = 'ID de partida: ' + gameId;
+    });
 }
 
 // Attach event listeners to buttons
 window.onload = () => {
-    const btnStart = document.getElementById('btn-start');
-    if (btnStart) btnStart.onclick = startGameClient;
-    const btnDraw = document.getElementById('btn-draw');
-    if (btnDraw) btnDraw.onclick = drawCardClient;
-    const btnUno = document.getElementById('btn-uno');
-    if (btnUno) btnUno.onclick = sayUnoClient;
-    const btnRestart = document.getElementById('btn-restart');
-    if (btnRestart) btnRestart.onclick = restartGameClient;
-    const btnJoin = document.getElementById('btn-join-game');
-    if (btnJoin) btnJoin.onclick = joinExistingGame;
+    const mode = localStorage.getItem('modoJuego');
+    if (mode === 'multijugador') {
+        if (document.getElementById('btn-start')) document.getElementById('btn-start').onclick = startGameClient;
+        if (document.getElementById('btn-join-game')) document.getElementById('btn-join-game').onclick = joinExistingGame;
+        if (document.getElementById('btn-restart')) document.getElementById('btn-restart').onclick = restartGameClient;
+    } else {
+        // Inicializa lógica local correctamente
+        const numJugadores = Number(localStorage.getItem('numJugadores')) || 4;
+        const tipoJuego = localStorage.getItem('tipoJuego') || 'bots';
+        startGame(numJugadores, tipoJuego);
+        mostrarTodasLasManos();
+        mostrarCartaDescarte();
+        mostrarMazo();
+        renderPoints();
+    }
 };
