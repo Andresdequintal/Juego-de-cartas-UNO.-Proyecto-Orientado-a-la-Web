@@ -207,7 +207,7 @@ button:hover {
 .div-mano{
     height: 100%;
     width: 100%;
-    overflow-x: auto;
+    overflow: visible;
     display: flex;
     flex-wrap: nowrap;
     gap: 1px;
@@ -219,7 +219,7 @@ button:hover {
 }
 
 .carta{
-    width: 80px;
+    width: 75px;
     height:auto;
     margin-left: -30px;
     position:relative;
@@ -420,7 +420,7 @@ td:first-child {
     50% { transform: scale(1.2) rotate(-10deg); box-shadow: 0 8px 24px #0003; }
     100% { transform: scale(1) rotate(0deg); box-shadow: 0 0 0 #0000; }
 }
-.carta-animada {
+#zona-descarte .carta {
     animation: lanzar-carta 0.4s cubic-bezier(.4,2,.6,1) 1;
     z-index: 10;
 }
