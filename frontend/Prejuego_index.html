@@ -41,7 +41,7 @@
             <div class="opciones">
               <ol>
                 <li><label for="bomba">Carta Bomba</label>
-                  <input type="checkbox" name="powerup" id="bomba" required>
+                  <input type="checkbox" name="powerup" id="bomb" required>
                 </li>
                 <ul>
                   <li>Se coloca en la zona de descarte y explota después de 3 turnos.</li>
@@ -116,7 +116,7 @@
     document.querySelector('.botonPre').addEventListener('click', function(e) {
         const numJugadores = document.getElementById('jugadores').value;
         const tipoJuego = document.getElementById('tipo-juego').value;
-        const bomba = document.getElementById('bomba').checked;
+        const bomba = document.getElementById('bomb').checked;
         const escudo = document.getElementById('escudo').checked;
         const robo = document.getElementById('robo').checked;
         const camaleon = document.getElementById('camaleon').checked;
