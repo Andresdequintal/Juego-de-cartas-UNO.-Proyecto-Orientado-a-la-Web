@@ -47,8 +47,11 @@ function initializeDeck(){
         deck.push({color:null, type:'wild', value:'draw4'});
     }
     for(let i=0; i<2; i++) {
-        console.log(localStorage.getItem('bomba'))
         if(localStorage.getItem('bomba')==='true'){deck.push({color:null, type:'wild', value:'bomba'})};
+        if(localStorage.getItem('escudo')==='true'){deck.push({color:null, type:'wild', value:'escudo'})};
+        if(localStorage.getItem('robo')==='true'){deck.push({color:null, type:'wild', value:'robo'})};
+        if(localStorage.getItem('camaleon')==='true'){deck.push({color:null, type:'wild', value:'camaleon'})};
+        if(localStorage.getItem('rebote')==='true'){deck.push({color:null, type:'wild', value:'rebote'})};
     }
     // Mezclar el mazo
     deck = deck.sort(()=>Math.random()-0.5);
@@ -260,6 +263,10 @@ function obtenerRutaImagen(card) {
         if (card.value === 'draw4') return 'images/Cartas/comodines generales/+4_comodin.png';
         if (card.value === 'wild') return 'images/Cartas/comodines generales/cambio_color.png';
         if (card.value === 'bomba') return 'images/Cartas/comodines generales/carta_bomba.jpeg';
+        if (card.value === 'escudo') return 'images/Cartas/comodines generales/escudo.jpeg';
+        if (card.value === 'robo') return 'images/Cartas/comodines generales/robo.jpeg';
+        if (card.value === 'camaleon') return 'images/Cartas/comodines generales/camaleon.jpeg';
+        if (card.value === 'rebote') return 'images/Cartas/comodines generales/rebote.jpeg';
     }
     return '';
 }
