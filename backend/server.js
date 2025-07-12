@@ -1,7 +1,17 @@
 const http = require('http');
-const { initializeGame } = require('./gameInit');
+const {
+  startGame,
+  playCard,
+  drawCard,
+  nextTurn,
+  sayUNO,
+  newRound
+} = require('./gameLogic');
+const WebSocket = require('ws');
 
 const PORT = 3001;
+const games = {};
+const wsClients = {}; // gameId -> Set of ws
 
 function parseBody(req, callback) {
   let body = '';
@@ -18,71 +28,170 @@ function parseBody(req, callback) {
 
 const server = http.createServer((req, res) => {
   if (req.method === 'POST' && req.url === '/start') {
-    // Inicializar una nueva partida
-    const gameState = initializeGame();
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(gameState));
-  } else if (req.method === 'POST' && req.url === '/play') {
-    // Jugar una carta
     parseBody(req, (err, body) => {
       if (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid JSON' }));
         return;
       }
-      // Aquí deberías actualizar el estado del juego según la carta jugada
-      // Por ahora, respondemos con un estado simulado
-      const updatedGameState = initializeGame();
+      const gameState = startGame();
+      games[gameState.gameId] = gameState;
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(updatedGameState));
+      res.end(JSON.stringify(serializeGameState(gameState)));
+    });
+  } else if (req.method === 'POST' && req.url === '/play') {
+    parseBody(req, (err, body) => {
+      if (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON' }));
+        return;
+      }
+      const { gameId, card, chosenColor } = body;
+      const gameState = games[gameId];
+      if (!gameState) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Game not found' }));
+        return;
+      }
+      const playerIndex = gameState.currentPlayerIndex;
+      playCard(gameState, playerIndex, card, chosenColor);
+      nextTurn(gameState);
+      broadcast(gameId, {
+        type: 'client_play',
+        player: gameState.players[playerIndex].name,
+        card,
+        gameState: serializeGameState(gameState)
+      });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(serializeGameState(gameState)));
     });
   } else if (req.method === 'POST' && req.url === '/draw') {
-    // Robar una carta
     parseBody(req, (err, body) => {
       if (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid JSON' }));
         return;
       }
-      // Aquí deberías actualizar el estado del juego tras robar una carta
-      // Por ahora, respondemos con un estado simulado
-      const updatedGameState = initializeGame();
+      const { gameId } = body;
+      const gameState = games[gameId];
+      if (!gameState) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Game not found' }));
+        return;
+      }
+      const playerIndex = gameState.currentPlayerIndex;
+      drawCard(gameState, playerIndex);
+      nextTurn(gameState);
+      broadcast(gameId, {
+        type: 'client_draw_from_deck',
+        player: gameState.players[playerIndex].name,
+        gameState: serializeGameState(gameState)
+      });
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(updatedGameState));
+      res.end(JSON.stringify(serializeGameState(gameState)));
     });
   } else if (req.method === 'POST' && req.url === '/uno') {
-    // Decir uno
     parseBody(req, (err, body) => {
       if (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid JSON' }));
         return;
       }
-      // Aquí deberías actualizar el estado del juego tras decir uno
-      // Por ahora, respondemos con un estado simulado
-      const updatedGameState = initializeGame();
+      const { gameId } = body;
+      const gameState = games[gameId];
+      if (!gameState) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Game not found' }));
+        return;
+      }
+      const playerIndex = gameState.currentPlayerIndex;
+      sayUNO(gameState, playerIndex);
+      broadcast(gameId, {
+        type: 'client_uno',
+        player: gameState.players[playerIndex].name,
+        gameState: serializeGameState(gameState)
+      });
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(updatedGameState));
+      res.end(JSON.stringify(serializeGameState(gameState)));
     });
   } else if (req.method === 'POST' && req.url === '/new-round') {
-    // Iniciar una nueva ronda
     parseBody(req, (err, body) => {
       if (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Invalid JSON' }));
         return;
       }
-      // Aquí deberías actualizar el estado del juego para una nueva ronda
-      // Por ahora, respondemos con un estado simulado
-      const updatedGameState = initializeGame();
+      const { gameId } = body;
+      const gameState = games[gameId];
+      if (!gameState) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Game not found' }));
+        return;
+      }
+      newRound(gameState);
+      broadcast(gameId, {
+        type: 'round_score',
+        winner: gameState.players[gameState.currentPlayerIndex].name,
+        winnerIdx: gameState.currentPlayerIndex,
+        roundScore: gameState.scores[gameState.currentPlayerIndex],
+        scores: gameState.scores,
+        gameState: serializeGameState(gameState)
+      });
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(updatedGameState));
+      res.end(JSON.stringify(serializeGameState(gameState)));
     });
   } else {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end('UNO server is running!');
   }
 });
+
+function serializeGameState(gameState) {
+  return {
+    finished: gameState.finished,
+    clientCards: gameState.players[0].cards,
+    currentColor: gameState.currentColor,
+    direction: gameState.direction,
+    discardPile: gameState.discardPile[gameState.discardPile.length - 1],
+    gameId: gameState.gameId,
+    otherPlayers: gameState.players.slice(1).map(p => ({ name: p.name, count: p.cards.length })),
+    scores: gameState.scores,
+    turn: gameState.currentPlayerIndex
+  };
+}
+
+// --- WebSocket server ---
+const wss = new WebSocket.Server({ server });
+wss.on('connection', (ws) => {
+  let subscribedGameId = null;
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data);
+      if (msg.type === 'subscribe' && msg.gameId) {
+        subscribedGameId = msg.gameId;
+        if (!wsClients[subscribedGameId]) wsClients[subscribedGameId] = new Set();
+        wsClients[subscribedGameId].add(ws);
+        ws.send(JSON.stringify({ type: 'subscribed', gameId: subscribedGameId }));
+      }
+    } catch (e) {}
+  });
+  ws.on('close', () => {
+    if (subscribedGameId && wsClients[subscribedGameId]) {
+      wsClients[subscribedGameId].delete(ws);
+      if (wsClients[subscribedGameId].size === 0) delete wsClients[subscribedGameId];
+    }
+  });
+});
+
+function broadcast(gameId, msg) {
+  if (wsClients[gameId]) {
+    for (const ws of wsClients[gameId]) {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(msg));
+      }
+    }
+  }
+}
 
 server.listen(PORT, () => {
   console.log(`UNO server listening at http://localhost:${PORT}`);
