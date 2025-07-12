@@ -1,37 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Jesús Acosta Pérez, José Ignacio Rueda Rivas, Andrés Daniel De Quintal">
-    <meta name="description" content="Proyecto Uno - Programacion Orientada a la Web">
-    <link rel="icon" href="images/favicon-16x16.png" type="image/x-icon">
-    <link rel="stylesheet" href="styles/style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="author"
+      content="Jesús Acosta Pérez, José Ignacio Rueda Rivas, Andrés Daniel De Quintal"
+    />
+    <meta
+      name="description"
+      content="Proyecto Uno - Programacion Orientada a la Web"
+    />
+    <link rel="icon" href="images/favicon-16x16.png" type="image/x-icon" />
+    <link rel="stylesheet" href="styles/style.css" />
+    <script src="scripts/script.js"></script>
     <title>Reglas</title>
-</head>
-<body>
+  </head>
+  <body>
     <div class="modo-container">
       <!-- Columna Multijugador -->
       <div class="modo-col modo-multijugador">
         <h2>Multijugador</h2>
-        <button id="btn-start" style="margin-bottom: 8px;">Iniciar partida</button>
-        <input type="text" id="join-game-id" placeholder="ID de partida" style="margin-bottom: 8px;">
-        <button id="btn-join-game" style="margin-bottom: 8px;">Unirse a partida</button>
-        <button id="btn-restart" style="margin-bottom: 8px;">Reiniciar partida</button>
-        <span id="current-game-id" style="font-weight: bold; margin-top: 12px;"></span>
-        <div style="margin-top: 32px; width: 100%;">
+        <button id="btn-start-multiplayer" style="margin-bottom: 8px">
+          Iniciar partida
+        </button>
+        <input
+          type="text"
+          id="join-game-id"
+          placeholder="ID de partida"
+          style="margin-bottom: 8px"
+        />
+        <button id="btn-join-game-multiplayer" style="margin-bottom: 8px">
+          Unirse a partida
+        </button>
+        <button id="btn-restart-multiplayer" style="margin-bottom: 8px">
+          Reiniciar partida
+        </button>
+        <span
+          id="current-game-id"
+          style="font-weight: bold; margin-top: 12px"
+        ></span>
+        <div style="margin-top: 32px; width: 100%">
           <div class="section-Reglas">
             <p>Reglas de Casa</p>
             <div class="opciones">
               <ol>
-                <li><label for="regla-1">UNO Progresivo</label>
-                  <input type="checkbox" name="regla-1" id="regla-1" required>
+                <li>
+                  <label for="regla-1">UNO Progresivo</label>
+                  <input type="checkbox" name="regla-1" id="regla-1" required />
                 </li>
-                <li><label for="regla-2">UNO Siete-Cero</label>
-                  <input type="checkbox" name="regla-2" id="regla-2" required>
+                <li>
+                  <label for="regla-2">UNO Siete-Cero</label>
+                  <input type="checkbox" name="regla-2" id="regla-2" required />
                 </li>
-                <li><label for="regla-3">UNO® Jump-In (Intervención Rápida)</label>
-                  <input type="checkbox" name="regla-3" id="regla-3" required>
+                <li>
+                  <label for="regla-3"
+                    >UNO® Jump-In (Intervención Rápida)</label
+                  >
+                  <input type="checkbox" name="regla-3" id="regla-3" required />
                 </li>
               </ol>
             </div>
@@ -40,40 +66,64 @@
             <p>Power Ups</p>
             <div class="opciones">
               <ol>
-                <li><label for="bomba">Carta Bomba</label>
-                  <input type="checkbox" name="powerup" id="bomb" required>
+                <li>
+                  <label for="bomba">Carta Bomba</label>
+                  <input type="checkbox" name="powerup" id="bomb" required />
                 </li>
                 <ul>
-                  <li>Se coloca en la zona de descarte y explota después de 3 turnos.</li>
-                  <li>El jugador en turno cuando explota debe robar 3 cartas.</li>
+                  <li>
+                    Se coloca en la zona de descarte y explota después de 3
+                    turnos.
+                  </li>
+                  <li>
+                    El jugador en turno cuando explota debe robar 3 cartas.
+                  </li>
                   <li><strong>Costo:</strong> -10 puntos.</li>
                 </ul>
-                <li><label for="escudo">Escudo</label>
-                  <input type="checkbox" name="powerup" id="escudo" required>
+                <li>
+                  <label for="escudo">Escudo</label>
+                  <input type="checkbox" name="powerup" id="escudo" required />
                 </li>
                 <ul>
-                  <li>Protege de cualquier penalización (+2, +4, bomba, etc.) por un turno</li>
+                  <li>
+                    Protege de cualquier penalización (+2, +4, bomba, etc.) por
+                    un turno
+                  </li>
                   <li><strong>Costo:</strong> -15 puntos.</li>
                 </ul>
-                <li><label for="robo">Robo Forzado</label>
-                  <input type="checkbox" name="powerup" id="robo" required>
+                <li>
+                  <label for="robo">Robo Forzado</label>
+                  <input type="checkbox" name="powerup" id="robo" required />
                 </li>
                 <ul>
                   <li>Fuerza a un oponente a intercambiar su mano contigo.</li>
                   <li><strong>Costo:</strong> -20 puntos</li>
                 </ul>
-                <li><label for="camaleon">Carta Camaleón</label>
-                  <input type="checkbox" name="powerup" id="camaleon" required>
+                <li>
+                  <label for="camaleon">Carta Camaleón</label>
+                  <input
+                    type="checkbox"
+                    name="powerup"
+                    id="camaleon"
+                    required
+                  />
                 </li>
                 <ul>
-                  <li>Se puede jugar en cualquier momento y copia la última carta jugada.</li>
+                  <li>
+                    Se puede jugar en cualquier momento y copia la última carta
+                    jugada.
+                  </li>
                   <li><strong>Costo:</strong> -15 puntos</li>
                 </ul>
-                <li><label for="rebote">Rebote</label>
-                  <input type="checkbox" name="powerup" id="rebote" required>
+                <li>
+                  <label for="rebote">Rebote</label>
+                  <input type="checkbox" name="powerup" id="rebote" required />
                 </li>
                 <ul>
-                  <li>Si te tiran un +2 o +4, puedes rebotarlo a otro jugador en vez de recibirlo.</li>
+                  <li>
+                    Si te tiran un +2 o +4, puedes rebotarlo a otro jugador en
+                    vez de recibirlo.
+                  </li>
                   <li><strong>Coste:</strong> -10 puntos.</li>
                 </ul>
               </ol>
@@ -89,7 +139,9 @@
           <div class="cantidad-jugadores">
             <ul>
               <li>
-                <label for="jugadores">Selecciona la cantidad de jugadores:</label>
+                <label for="jugadores"
+                  >Selecciona la cantidad de jugadores:</label
+                >
                 <select name="jugadores" id="jugadores" required>
                   <option value="2">2</option>
                   <option value="3">3</option>
@@ -106,50 +158,58 @@
             </ul>
           </div>
         </div>
-        <button class="botonPre" style="margin-top: 32px;">Comenzar juego</button>
+        <button class="botonPre" style="margin-top: 32px">
+          Comenzar juego
+        </button>
       </div>
     </div>
-    <div id="pantalla-carga" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#fff; z-index:2000; justify-content:center; align-items:center;">
-      <img src="images/imagenes decorativas/pantalla_carga.png" alt="Cargando..." style="max-width:60vw; max-height:60vh;">
+    <div
+      id="pantalla-carga"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #fff;
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <img
+        src="images/imagenes decorativas/pantalla_carga.png"
+        alt="Cargando..."
+        style="max-width: 60vw; max-height: 60vh"
+      />
     </div>
     <script>
-    document.querySelector('.botonPre').addEventListener('click', function(e) {
-        const numJugadores = document.getElementById('jugadores').value;
-        const tipoJuego = document.getElementById('tipo-juego').value;
-        const bomba = document.getElementById('bomb').checked;
-        const escudo = document.getElementById('escudo').checked;
-        const robo = document.getElementById('robo').checked;
-        const camaleon = document.getElementById('camaleon').checked;
-        const rebote = document.getElementById('rebote').checked;
+      document
+        .querySelector(".botonPre")
+        .addEventListener("click", function (e) {
+          const numJugadores = document.getElementById("jugadores").value;
+          const tipoJuego = document.getElementById("tipo-juego").value;
+          const bomba = document.getElementById("bomb").checked;
+          const escudo = document.getElementById("escudo").checked;
+          const robo = document.getElementById("robo").checked;
+          const camaleon = document.getElementById("camaleon").checked;
+          const rebote = document.getElementById("rebote").checked;
 
-        localStorage.setItem('numJugadores', numJugadores);
-        localStorage.setItem('tipoJuego', tipoJuego);
-        localStorage.setItem('bomba',bomba)
-        localStorage.setItem('escudo',escudo)
-        localStorage.setItem('robo',robo)
-        localStorage.setItem('camaleon',camaleon)
-        localStorage.setItem('rebote',rebote)
-        
-        // Mostrar pantalla de carga
-        document.getElementById('pantalla-carga').style.display = 'flex';
-        setTimeout(function() {
-            window.location.href = 'Juego_index.html';
-        }, 2000);
-    });
-    document.getElementById('btn-multiplayer').onclick = function() {
-        localStorage.setItem('modoJuego', 'multijugador');
-        window.location.href = 'Juego_index.html';
-    };
-    document.getElementById('btn-local').onclick = function() {
-        const numJugadores = document.getElementById('jugadores').value;
-        const tipoJuego = document.getElementById('tipo-juego').value;
-        // Forzar los valores a 'humanos' o 'bots' para evitar errores
-        const tipoJuegoValido = (tipoJuego === 'humanos') ? 'humanos' : 'bots';
-        localStorage.setItem('numJugadores', numJugadores);
-        localStorage.setItem('tipoJuego', tipoJuegoValido);
-        localStorage.setItem('modoJuego', 'local');
-        window.location.href = 'Juego_index.html';
-    };
+          localStorage.setItem("numJugadores", numJugadores);
+          localStorage.setItem("tipoJuego", tipoJuego);
+          localStorage.setItem("bomba", bomba);
+          localStorage.setItem("escudo", escudo);
+          localStorage.setItem("robo", robo);
+          localStorage.setItem("camaleon", camaleon);
+          localStorage.setItem("rebote", rebote);
+
+          // Mostrar pantalla de carga
+          document.getElementById("pantalla-carga").style.display = "flex";
+          setTimeout(function () {
+            window.location.href = "Juego_index.html";
+          }, 2000);
+        });
     </script>
-</body>
+  </body>
 </html>
