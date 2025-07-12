@@ -612,6 +612,7 @@ function mostrarGameIdEnJuego(gameId) {
     document.body.appendChild(gameIdDiv);
   }
   gameIdDiv.textContent = "ID de partida: " + gameId;
+  gameIdDiv.style.display = "block";
 }
 
 // 2. Modificar startGameClient para crear partida con 1 jugador
@@ -620,19 +621,26 @@ function startGameClient() {
   fetch("http://localhost:3001/start", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ numPlayers: 1 }), // Solo el host al inicio
+    body: JSON.stringify({ numPlayers: 1 }), // Solo el host
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log("DATA", data);
       gameId = data.gameId;
-      gameState = data;
-      connectWebSocket(gameId);
-      updateGameStateUI(data);
-      mostrarGameIdEnJuego(gameId); // Mostrar el gameId en la pantalla de juego
-      // Mostrar el gameId en la UI de lobby si existe
+      localStorage.setItem("gameId", gameId);
+      // Mostrar el ID en el lobby si existe el elemento
       const gameIdDiv = document.getElementById("current-game-id");
-      if (gameIdDiv) gameIdDiv.textContent = "ID de partida: " + gameId;
+      if (gameIdDiv) {
+        gameIdDiv.textContent = "ID de partida: " + gameId;
+        gameIdDiv.style.display = "block";
+      }
+      // También mostrarlo en la esquina si estamos en el lobby
+      if (!window.location.pathname.includes("Juego_index.html")) {
+        mostrarGameIdEnJuego(gameId);
+      }
+      // Redirige al tablero después de un pequeño delay para que el usuario vea el ID
+      setTimeout(() => {
+        window.location.href = "Juego_index.html";
+      }, 1200);
     });
 }
 
@@ -735,6 +743,7 @@ function updateGameStateUI(state) {
   }
 
   if (state.gameId) mostrarGameIdEnJuego(state.gameId);
+  else if (gameId) mostrarGameIdEnJuego(gameId); // Refuerzo
   // Add more UI updates as needed
 }
 
@@ -897,6 +906,26 @@ function joinExistingGame() {
 
 // Attach event listeners to buttons
 window.onload = () => {
+  // Si estamos en la pantalla de juego multijugador
+  if (window.location.pathname.includes("Juego_index.html")) {
+    const storedGameId = localStorage.getItem("gameId");
+    if (storedGameId) {
+      gameId = storedGameId;
+      mostrarGameIdEnJuego(gameId); // Mostrar el ID SIEMPRE
+      connectWebSocket(gameId);
+      // Obtener el estado inicial del juego
+      fetch("http://localhost:3001/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameId }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          updateGameStateUI(data);
+          mostrarGameIdEnJuego(gameId);
+        });
+    }
+  }
   if (document.getElementById("btn-start-multiplayer")) {
     document
       .getElementById("btn-start-multiplayer")
