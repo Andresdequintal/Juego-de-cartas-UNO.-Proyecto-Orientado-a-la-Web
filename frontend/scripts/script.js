@@ -9,6 +9,7 @@ let currentPlayerIndex=0;
 let direction=1;
 let currentColor = null; // Color actual del juego (para comodines)
 let over=0; //si la ronda se ha acabado
+let bomb=0; //contador hasta que explote la bomba
 
 const card = {
     id:'R-5',
@@ -154,6 +155,7 @@ function playCard(playerIndex, card) {
                             players[playerIndex].points-=10
                         }
                         if(card.value==='bomba'){
+                            bomb+=4;
                             players[playerIndex].points-=10
                         }
                         if (card.value === 'draw4') {
@@ -217,10 +219,20 @@ function nextTurn(){
         window.location.href='ResultadoJuego_index.html';
     }else{
         currentPlayerIndex = (currentPlayerIndex + direction + players.length) % players.length;
+        if(bomb>0){
+            bomb-=1;
+            alertaBomba.classList.add('block')
+            alertaBomba.textContent='Quedan '+bomb+' turnos para que reviente la bomba!'
+            if(bomb===0){
+                drawCard(currentPlayerIndex)
+                drawCard(currentPlayerIndex)
+                drawCard(currentPlayerIndex)
+                alertaBomba.classList.remove('block')
+            }
+        }
         renderPoints();
     }
 }
-
 function checkUNO(playerIndex){
     // Si al jugador le queda una carta, debe decir UNO
     if(players[playerIndex].cards.length === 1){
@@ -529,7 +541,6 @@ function mostrarGameIdEnJuego(gameId) {
 
 // 2. Modificar startGameClient para crear partida con 1 jugador
 function startGameClient() {
-    console.log('Iniciando partida...');
     fetch('http://localhost:3001/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -604,40 +615,11 @@ function highlightTurn(turn) {
 // 4. Llamar mostrarGameIdEnJuego también cuando se actualiza el estado del juego
 function updateGameStateUI(state) {
     gameState = state;
-    // Renderizado visual unificado para multijugador y local
-    if (localStorage.getItem('modoJuego') === 'multijugador') {
-        // Simular estructura de players y deck para las funciones visuales existentes
-        players = [{
-            id: 'player1',
-            name: 'Jugador 1',
-            cards: state.clientCards || [],
-            points: state.scores ? state.scores[0] : 0,
-            saidUNO: false,
-            isHuman: true
-        }];
-        // Otros jugadores (solo para mostrar el reverso de cartas)
-        if (state.otherPlayers) {
-            for (let i = 0; i < state.otherPlayers.length; i++) {
-                players.push({
-                    id: 'player' + (i + 2),
-                    name: state.otherPlayers[i].name || ('Jugador ' + (i + 2)),
-                    cards: Array(state.otherPlayers[i].count).fill({}),
-                    points: state.scores ? state.scores[i + 1] : 0,
-                    saidUNO: false,
-                    isHuman: false
-                });
-            }
-        }
-        currentPlayerIndex = state.turn || 0;
-        direction = state.direction || 1;
-        currentColor = state.currentColor || null;
-        discardPile = [state.discardPile];
-        deck = Array.isArray(state.deck) ? state.deck : [];
-        mostrarTodasLasManos();
-        mostrarCartaDescarte();
-        mostrarMazo();
-        renderPoints();
-    }
+    renderPlayerCards(state.clientCards);
+    renderTurn(state.turn);
+    renderScores(state.scores);
+    updateUnoButton(state.clientCards);
+    highlightTurn(state.turn);
     if (state.gameId) mostrarGameIdEnJuego(state.gameId);
     // Add more UI updates as needed
 }
@@ -790,10 +772,7 @@ function joinExistingGame() {
 window.onload = () => {
     const mode = localStorage.getItem('modoJuego');
     if (mode === 'multijugador') {
-        if (document.getElementById('btn-start')) {
-            console.log('Iniciando partida...');
-            document.getElementById('btn-start').addEventListener('click', startGameClient());
-        }
+        if (document.getElementById('btn-start')) document.getElementById('btn-start').onclick = startGameClient;
         if (document.getElementById('btn-join-game')) document.getElementById('btn-join-game').onclick = joinExistingGame;
         if (document.getElementById('btn-restart')) document.getElementById('btn-restart').onclick = restartGameClient;
     } else {
